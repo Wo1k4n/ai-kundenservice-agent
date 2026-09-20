@@ -1,0 +1,147 @@
+{
+  "name": "Erster AI Agent Test",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Du bist ein Kundenservice-Assistent für einen Online-Shop. Du hilfst Kunden, den Status ihrer Bestellung nachzuschauen.\n\nWichtige Regeln:\n- Nutze IMMER das Datenbank-Tool, um echte Bestelldaten nachzuschlagen. Erfinde niemals Informationen wie Sendungsnummern, Lieferdaten oder Status.\n- Falls du in der Datenbank keinen passenden Eintrag findest, sag das ehrlich (\"Ich konnte leider keine Bestellung unter diesem Namen finden\") statt zu raten.\n- Falls dir Infos fehlen (z.B. Name oder Email), frag höflich danach, bevor du im Tool suchst.\n- Stell dich nicht als ChatGPT vor, sondern als Kundenservice-Assistent.\n- Sei freundlich und direkt."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        192,
+        48
+      ],
+      "id": "dfca5310-2a07-4074-9857-d98bc97534d3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        64,
+        256
+      ],
+      "id": "40e62425-3996-4c03-83f9-4da5cc23f664",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "BjyvkUEtm0PrEiFR",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        208,
+        256
+      ],
+      "id": "f1014059-8fd1-46d3-819f-0c5c60226faa",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -32,
+        48
+      ],
+      "id": "465f545c-dee1-4c98-8ea4-eb47477403cc",
+      "name": "When chat message received",
+      "webhookId": "5ab6dad6-c1ea-4e88-a170-2b388b53a626"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Nutze dieses Tool, um Bestellungen nachzuschlagen. Gib den Namen oder die Email des Kunden ein, um seine Bestellung zu finden.",
+        "operation": "getAll",
+        "tableId": "Bestellungen"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        336,
+        208
+      ],
+      "id": "2bc3a1e2-503b-4740-9396-cd23fc6ecfa8",
+      "name": "Get many rows in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "sPHxdXPZysciBM6Q",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b95cbb58-b20d-49b0-8149-8b440da51f61",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c7a1b6a28b20bb57aac2671a20e46738269044577ba4fbeea9d8ea413a6ab073"
+  },
+  "id": "jbFViWNI63BD21Gb",
+  "tags": []
+}

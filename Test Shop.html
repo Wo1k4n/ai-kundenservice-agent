@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Shop - Bestellung</title>
+</head>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0d1117;
+  font-family: sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 420px;
+  background: #161b22;
+  border-radius: 20px;
+  padding: 30px;
+}
+
+.header {
+  color: #e6edf3;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.produkt-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.produkt-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #21262d;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.produkt-info {
+  color: #e6edf3;
+}
+
+.produkt-name {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.produkt-preis {
+  font-size: 13px;
+  color: #7d8590;
+  margin-top: 2px;
+}
+
+.kaufen-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #58a6ff;
+  color: #0d1117;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.kaufen-btn:hover {
+  opacity: 0.9;
+}
+
+.formular {
+  display: none;
+}
+
+.formular.aktiv {
+  display: block;
+}
+
+.produkt-liste.versteckt {
+  display: none;
+}
+
+.ausgewaehlt {
+  color: #58a6ff;
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+label {
+  color: #7d8590;
+  font-size: 13px;
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+
+input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  background: #21262d;
+  color: #e6edf3;
+  font-size: 15px;
+  outline: none;
+}
+
+.bestellen-btn, .zurueck-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+  margin-top: 16px;
+}
+
+.bestellen-btn {
+  background: #58a6ff;
+  color: #0d1117;
+}
+
+.zurueck-btn {
+  background: #21262d;
+  color: #e6edf3;
+}
+
+.status {
+  margin-top: 16px;
+  text-align: center;
+  color: #e6edf3;
+  font-size: 14px;
+}
+
+.chat-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: #58a6ff;
+  font-size: 14px;
+  text-decoration: none;
+}
+</style>
+
+<body>
+  <div class="wrapper">
+    <div class="header">Shop</div>
+
+    <div class="produkt-liste" id="produktListe">
+      <div class="produkt-card">
+        <div class="produkt-info">
+          <div class="produkt-name">Laptop Tasche</div>
+          <div class="produkt-preis">29,99€</div>
+        </div>
+        <button class="kaufen-btn" onclick="produktWaehlen('Laptop Tasche')">Kaufen</button>
+      </div>
+
+      <div class="produkt-card">
+        <div class="produkt-info">
+          <div class="produkt-name">Kopfhörer</div>
+          <div class="produkt-preis">79,99€</div>
+        </div>
+        <button class="kaufen-btn" onclick="produktWaehlen('Kopfhörer')">Kaufen</button>
+      </div>
+
+      <div class="produkt-card">
+        <div class="produkt-info">
+          <div class="produkt-name">Wasserflasche</div>
+          <div class="produkt-preis">14,99€</div>
+        </div>
+        <button class="kaufen-btn" onclick="produktWaehlen('Wasserflasche')">Kaufen</button>
+      </div>
+
+      <div class="produkt-card">
+        <div class="produkt-info">
+          <div class="produkt-name">USB-C Ladekabel</div>
+          <div class="produkt-preis">9,99€</div>
+        </div>
+        <button class="kaufen-btn" onclick="produktWaehlen('USB-C Ladekabel')">Kaufen</button>
+      </div>
+    </div>
+
+    <div class="formular" id="formular">
+      <div class="ausgewaehlt" id="ausgewaehltText"></div>
+
+      <label for="name">Name</label>
+      <input id="name" type="text" placeholder="Max Mustermann">
+
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="max@beispiel.de">
+
+      <button class="bestellen-btn" onclick="bestellen()">Jetzt bestellen</button>
+      <button class="zurueck-btn" onclick="zurueck()">Zurück zur Auswahl</button>
+
+      <div class="status" id="status"></div>
+    </div>
+
+    <a class="chat-link" href="kundenservice-chat.html">Fragen zu deiner Bestellung? Chat öffnen →</a>
+  </div>
+
+  <script>
+const WEBHOOK_URL = "http://localhost:5678/webhook/c0ae5c52-3a94-4a29-ae0f-bf28bb79dc43";
+
+let ausgewaehltesProdukt = "";
+
+function produktWaehlen(produkt) {
+  ausgewaehltesProdukt = produkt;
+  document.getElementById("ausgewaehltText").innerText = "Ausgewählt: " + produkt;
+  document.getElementById("produktListe").classList.add("versteckt");
+  document.getElementById("formular").classList.add("aktiv");
+}
+
+function zurueck() {
+  document.getElementById("produktListe").classList.remove("versteckt");
+  document.getElementById("formular").classList.remove("aktiv");
+  document.getElementById("status").innerText = "";
+}
+
+async function bestellen() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const status = document.getElementById("status");
+
+  if (!name || !email) {
+    status.innerText = "Bitte Name und Email ausfüllen.";
+    return;
+  }
+
+  status.innerText = "Bestellung wird gesendet...";
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, produkt: ausgewaehltesProdukt })
+    });
+    const text = await res.text();
+    status.innerText = text;
+
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
+  } catch (e) {
+    status.innerText = "Fehler - bitte prüf die Webhook URL.";
+  }
+}
+  </script>
+</body>
+</html>

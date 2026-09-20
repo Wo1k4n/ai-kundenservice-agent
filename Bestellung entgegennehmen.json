@@ -1,0 +1,113 @@
+{
+  "name": "Bestellung entgegennehmen",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c0ae5c52-3a94-4a29-ae0f-bf28bb79dc43",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "4531f118-bac1-4c9b-9ae9-75b55bc0188c",
+      "name": "Webhook",
+      "webhookId": "c0ae5c52-3a94-4a29-ae0f-bf28bb79dc43"
+    },
+    {
+      "parameters": {
+        "tableId": "Bestellungen",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "kunde_name",
+              "fieldValue": "={{ $json.body.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.body.email }}"
+            },
+            {
+              "fieldId": "produkt",
+              "fieldValue": "={{ $json.body.produkt }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "neu"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "62cd9cae-da87-4958-806e-07b3afe2f824",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "sPHxdXPZysciBM6Q",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Bestellung erfolgreich aufgegeben!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        416,
+        0
+      ],
+      "id": "869c7d12-73a0-4be6-b50c-9cff88d731b4",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7371f8a0-18cd-42b9-ad26-8a0e6a675eeb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c7a1b6a28b20bb57aac2671a20e46738269044577ba4fbeea9d8ea413a6ab073"
+  },
+  "id": "DlbML8rGAy7OmGcx",
+  "tags": []
+}
